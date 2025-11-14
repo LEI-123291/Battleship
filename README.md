@@ -9,7 +9,7 @@ Ricardo Daniel Ferreira Sá Lourenço, nº 122692;
 João Daniel Silva, nº 122670;
 João Pedro Gatinho Palhau, nº 123291;
 
-
+PARTE 1 B- Ricardo Lourenço, 122692 fez, o Joao, 122670 n veio a aula
 ## Continuous Integration
 
 Este projeto usa um workflow GitHub Actions baseado em "Java with Maven"
