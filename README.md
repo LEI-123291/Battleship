@@ -13,7 +13,7 @@ João Pedro Gatinho Palhau, nº 123291;
 
 
 ## Continuous Integration
-PARTE 1 B- Ricardo Lourenço, 122692 fez, o Joao, 122670 nao veio a aula
+PARTE 1 B- Ricardo Lourenço, 122692 fez, o Joao, 122670 não veio a aula
 
 Este projeto usa um workflow GitHub Actions baseado em "Java with Maven"
 para correr automaticamente os testes unitários em cada push e pull request
