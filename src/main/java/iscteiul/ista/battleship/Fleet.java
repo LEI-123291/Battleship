@@ -1,28 +1,29 @@
-/**
- *
- */
 package iscteiul.ista.battleship;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Fleet implements IFleet {
+
     /**
-     * This operation prints all the given ships
-     *
-     * @param ships The list of ships
+     * Prints all given ships (safe, testable)
      */
     static void printShips(List<IShip> ships) {
-        for (IShip ship : ships)
+        if (ships == null || ships.isEmpty()) {
+            System.out.println("(no ships)");
+            return;
+        }
+        for (IShip ship : ships) {
             System.out.println(ship);
+        }
     }
 
     // -----------------------------------------------------
 
-    private List<IShip> ships;
+    private final List<IShip> ships;
 
     public Fleet() {
-        ships = new ArrayList<>();
+        this.ships = new ArrayList<>();
     }
 
     @Override
@@ -30,115 +31,136 @@ public class Fleet implements IFleet {
         return ships;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see battleship.IFleet#addShip(battleship.IShip)
+    /**
+     * Adds a ship if possible.
      */
     @Override
     public boolean addShip(IShip s) {
-        boolean result = false;
-        if ((ships.size() <= FLEET_SIZE) && (isInsideBoard(s)) && (!colisionRisk(s))) {
-            ships.add(s);
-            result = true;
+        if (s == null) return false;
+
+        // fleet not full
+        if (ships.size() >= FLEET_SIZE) return false;
+
+        // inside board
+        if (!isInsideBoard(s)) return false;
+
+        // collision check
+        if (colisionRisk(s)) return false;
+
+        ships.add(s);
+        return true;
+    }
+
+    /**
+     * Ships with category
+     */
+    @Override
+    public List<IShip> getShipsLike(String category) {
+        List<IShip> result = new ArrayList<>();
+        if (category == null) return result;
+
+        for (IShip s : ships) {
+            if (category.equals(s.getCategory())) {
+                result.add(s);
+            }
         }
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see battleship.IFleet#getShipsLike(java.lang.String)
-     */
-    @Override
-    public List<IShip> getShipsLike(String category) {
-        List<IShip> shipsLike = new ArrayList<>();
-        for (IShip s : ships)
-            if (s.getCategory().equals(category))
-                shipsLike.add(s);
-
-        return shipsLike;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see battleship.IFleet#getFloatingShips()
+    /**
+     * Ships still floating
      */
     @Override
     public List<IShip> getFloatingShips() {
-        List<IShip> floatingShips = new ArrayList<>();
-        for (IShip s : ships)
-            if (s.stillFloating())
-                floatingShips.add(s);
-
-        return floatingShips;
+        List<IShip> floating = new ArrayList<>();
+        for (IShip s : ships) {
+            if (s.stillFloating()) {
+                floating.add(s);
+            }
+        }
+        return floating;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see battleship.IFleet#shipAt(battleship.IPosition)
+    /**
+     * Returns ship at given position, or null.
      */
     @Override
     public IShip shipAt(IPosition pos) {
-        for (int i = 0; i < ships.size(); i++)
-            if (ships.get(i).occupies(pos))
-                return ships.get(i);
+        if (pos == null) return null;
+
+        for (IShip ship : ships) {
+            if (ship.occupies(pos)) {
+                return ship;
+            }
+        }
         return null;
     }
 
+    /**
+     * True if all ship positions inside board.
+     */
     private boolean isInsideBoard(IShip s) {
-        return (s.getLeftMostPos() >= 0 && s.getRightMostPos() <= BOARD_SIZE - 1 && s.getTopMostPos() >= 0
-                && s.getBottomMostPos() <= BOARD_SIZE - 1);
+        return s.getLeftMostPos() >= 0 &&
+                s.getRightMostPos() < BOARD_SIZE &&
+                s.getTopMostPos() >= 0 &&
+                s.getBottomMostPos() < BOARD_SIZE;
     }
 
+    /**
+     * True if too close to any ship.
+     */
     private boolean colisionRisk(IShip s) {
-        for (int i = 0; i < ships.size(); i++) {
-            if (ships.get(i).tooCloseTo(s))
-                return true;
+        for (IShip existing : ships) {
+            if (existing.tooCloseTo(s)) return true;
         }
         return false;
     }
 
-
     /**
-     * This operation shows the state of a fleet
+     * Prints full fleet status (improved ― loop over categories).
      */
     public void printStatus() {
         printAllShips();
         printFloatingShips();
-        printShipsByCategory("Galeao");
-        printShipsByCategory("Fragata");
-        printShipsByCategory("Nau");
-        printShipsByCategory("Caravela");
-        printShipsByCategory("Barca");
+
+        String[] categories = {
+                "Galeao",
+                "Fragata",
+                "Nau",
+                "Caravela",
+                "Barca"
+        };
+
+        for (String cat : categories) {
+            printShipsByCategory(cat);
+        }
     }
 
     /**
-     * This operation prints all the ships of a fleet belonging to a particular
-     * category
-     *
-     * @param category The category of ships of interest
+     * Prints ships belonging to a category
      */
     public void printShipsByCategory(String category) {
-        assert category != null;
+        if (category == null) {
+            System.out.println("(null category)");
+            return;
+        }
 
-        printShips(getShipsLike(category));
+        List<IShip> shipsLike = getShipsLike(category);
+        printShips(shipsLike);
     }
 
     /**
-     * This operation prints all the ships of a fleet but not yet shot
+     * Prints floating ships
      */
     public void printFloatingShips() {
         printShips(getFloatingShips());
     }
 
     /**
-     * This operation prints all the ships of a fleet
+     * Prints all ships
      */
     void printAllShips() {
         printShips(ships);
     }
-
 }
+
